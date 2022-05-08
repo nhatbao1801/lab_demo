@@ -1,0 +1,21 @@
+/*
+Enter your query here.
+*/
+SELECT Ct.contest_id, Ct.hacker_id, Ct.name
+/*, SS.total_submissions, SS.total_accepted_submissions
+, VS.total_views, VS.total_unique_views*/
+,SUM(SS.sum_ts), SUM(SS.sum_tas)
+,SUM(VS.sum_tv), SUM(VS.sum_tuv)
+/**/
+from Contests as Ct 
+JOIN Colleges as Cl USING(contest_id)
+JOIN Challenges as Ch USING(college_id)
+LEFT JOIN (
+    Select challenge_id, SUM(total_submissions) as sum_ts, SUM(total_accepted_submissions) as sum_tas from Submission_Stats Group by challenge_id
+) as SS USING(challenge_id)
+LEFT JOIN (
+    Select challenge_id, SUM(total_views) as sum_tv, SUM(total_unique_views) as sum_tuv
+    from View_Stats Group by challenge_id
+) as VS USING(challenge_id)
+Group by Ct.contest_id, Ct.hacker_id, Ct.name 
+Order by Ct.contest_id
